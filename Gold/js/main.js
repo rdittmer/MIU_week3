@@ -1,15 +1,24 @@
 // Ryan Dittmer
-// Week 1
+// Week 3
 // MIU 1208
 
-window.addEventListener( "DOMContentLoaded", function(){
+$(document).bind('pageinit', function(){
+	var form = $( '#levelForm' );
+    form.validate({
+      invalidHandler: function(form, validator){},
+      submitHandler: function(){
+				storeData();
+      }
+   });
+});
+	
 
 	function ge( x ){
 		var theElement = document.getElementById( x );
 		return theElement;
 	}
 	
-	function makegroup()
+	/*function makegroup()
 	{
 		var formTag     = document.getElementsByTagName( "form" ),
 			selectLi       = ge( 'group' ),
@@ -23,34 +32,35 @@ window.addEventListener( "DOMContentLoaded", function(){
 			makeSelect.appendChild( makeOption );
 		}
 		selectLi.appendChild( makeSelect );
-	}
+	}*/
 //////////////////////////////////	
 	function storeData( key )
 	{
+		var id;
 		if ( !key ) 
 		{
-			var id     = Math.floor( Math.random() * 10001 );
+		    id     = Math.floor( Math.random() * 10001 );
 		}
 		else
 		{
 			id         = key;
 		}
-		getSelectedRadio();
+		//getSelectedRadio();
 		var item       = {};
 		
-		item.group           = ["Group:"  ,           ge( 'group' ).value];
-		item.levelName       = ["Level Name:"     ,   ge( 'levelName' ).value];
-		item.numberFloors    = ["Number of Floors:" , ge( 'numberFloors' ).value];
-		item.difficulty      = ["Difficulty:"   ,     difficultyValue];
-		item.date            = ["Date:"   ,           ge( 'date' ).value];
-		item.notes           = ["Notes"       ,       ge( 'notes' ).value];
+		item.group           = ["Group:"  ,           $( '#group' ).val()];
+		item.levelName       = ["Level Name:"     ,   $( '#levelName' ).val()];
+		item.numberFloors    = ["Number of Floors:" , $( '#numberFloors' ).val()];
+		item.difficulty      = ["Difficulty:"   ,     $( 'input[name=difficulty]:checked', '#levelForm' ).val()];
+		item.date            = ["Date:"   ,           $( '#date' ).val()];
+		item.notes           = ["Notes"       ,       $( '#notes' ).val()];
 		
 		localStorage.setItem( id, JSON.stringify( item ) );
 		alert( "Level Added!" );
 	}
 
 ///////////////////////////////////
-	function getSelectedRadio()
+	/*function getSelectedRadio()
 	{
 		var radios = document.forms[0].difficulty;
 		
@@ -59,7 +69,7 @@ window.addEventListener( "DOMContentLoaded", function(){
 			if ( radios[i].checked )
 				difficultyValue = radios[i].value;
 		}
-	}
+	}*/
 	///////////////////
 	function getData()
 	{
@@ -73,7 +83,8 @@ window.addEventListener( "DOMContentLoaded", function(){
 		makeDiv.setAttribute( "id", "items" );
 		var makeList = document.createElement( 'ul' );
 		makeDiv.appendChild( makeList );
-		document.body.appendChild( makeDiv );
+		$( '#showData' ).append( makeDiv );
+		//document.body.appendChild( makeDiv );
 		ge( 'items' ).style.display = "block";
 		for( var i = 0, len = localStorage.length; i < len; i++ )
 		{
@@ -122,7 +133,7 @@ window.addEventListener( "DOMContentLoaded", function(){
 		var editLink         = document.createElement( 'n' );
 		editLink.href        = "#";
 		editLink.key         = key;
-		var editText         = "Edit Levels";
+		var editText         = "Edit Level";
 		editLink.addEventListener( "click", editItem );
 		editLink.innerHTML   = editText;
 		linksLi.appendChild( editLink );
@@ -146,27 +157,15 @@ window.addEventListener( "DOMContentLoaded", function(){
 		
 		toggleControls( "off" );
 		
-		ge( 'group' ).value = item.group[1];
-		ge( 'levelName' ).value     = item.levelName[1];
-		ge( 'numberFloors' ).value = item.numberFloors[1];
-		var radios = document.forms[0].difficulty;
-		for ( var i = 0; i < radios.length; i++ )
-		{
-			if ( radios[i].value == "Beginner" && item.difficulty[1] == "Beginner" )
-				radios[i].setAttribute( "checked", "checked" );
-			else if ( radios[i].value == "Intermediate" && item.difficulty[1] == "Intermediate" )
-				radios[i].setAttribute( "checked", "checked" );
-			else if ( radios[i].value == "Advanced" && item.difficulty[1] == "Advanced" )
-				radios[i].setAttribute( "checked", "checked" );
-		}
-		ge( 'date' ).value      = item.date[1];
-		ge( 'notes' ).value     = item.notes[1];
+		$( '#group' ).val( item.group[1] );
+		$( '#levelName' ).val( item.levelName[1] );
+		$( '#numberFloors' ).val( item.numberFloors[1] );
+		$( '#difficulty' ).val( item.difficulty[1] );
+		$( '#date' ).val( item.date[1] );
+		$( '#notes' ).val( item.notes[1] );
 		
-		save.removeEventListener( "click", storeData );
-		ge( 'submit' ).value    = "Edit Level";
-		var editSubmit         = ge( 'submit' );
-		editSubmit.addEventListener( "click", validate );
-		editSubmit.key         = this.key;
+		thiskey         = this.key;
+		//$( '#submit' ).on( 'click', storeData( thiskey ) );
 	}
 	
 	function deleteItem()
@@ -184,7 +183,7 @@ window.addEventListener( "DOMContentLoaded", function(){
 		}
 	}
 	
-	function validate(e)
+	/*function validate(e)
 	{
 		var getgroup           = ge( 'group' );
 		var getlevelName         = ge( 'levelName' );
@@ -226,7 +225,6 @@ window.addEventListener( "DOMContentLoaded", function(){
 				txt.innerHTML = messageArray[i];
 				errMessage.appendChild( txt );
 			}
-			alert( "There are errors in your input" );
 			e.preventDefault();
 			return false;
 		}
@@ -234,25 +232,25 @@ window.addEventListener( "DOMContentLoaded", function(){
 		{
 			storeData( this.key );
 		}
-	}
+	}*/
 	
 	function toggleControls( n )
 	{
 		switch( n )
 		{
 			case "on":
-				ge('levelForm').style.display      = "none";
-				ge('clear').style.display           = "inline";
-				ge('displayData').style.display = "none";
-				ge('addNew').style.display       = "inline";
+				$( '#levelForm' ).toggle( "hide" );
+				//$( '#clearData' ).toggle( "show" );
+				$( '#displayData' ).toggle( "hide" );
+				$( '#addNew' ).removeClass( "ui-disabled" );
 				break;
 				
 			case "off":
-				ge('levelForm').style.display       = "block";
-				ge('clear').style.display            = "inline";
-				ge('displayData').style.display  = "inline";
-				ge('addNew').style.display        = "none";
-				ge('items').style.display           = "none";
+				$( '#levelForm' ).toggle( "show" );
+				//$( '#clearData' ).toggle( "show" );
+				$( '#displayData' ).toggle( "show" );
+				$( '#addNew' ).addClass( "ui-disabled" );
+				$( '#items' ).toggle( "hide" );
 				break;
 				
 			default:
@@ -271,16 +269,17 @@ window.addEventListener( "DOMContentLoaded", function(){
 		}
 	}
 	
-	var group = [ "<-Select Level Group->", "Set 1", "Set 2", "Set 3", "Set 4", "Bonus Set" ];
-	var difficultyValue;
-	var errMessage = ge( 'errors' );
-	makegroup();
+	function windowReload(){
+		window.location.reload();
+		return false;
+	}
 	
-	var displayLink = ge( 'displayData' );
-	displayLink.addEventListener( "click", getData );
-	var clearLink   = ge( 'clear' );
-	clearLink.addEventListener( "click", clearLocal );
-	var save        = ge( 'submit' );
-	save.addEventListener( "click", validate );
+	//var group = [ "<-Select Level Group->", "Set 1", "Set 2", "Set 3", "Set 4", "Bonus Set" ];
+	//var difficultyValue;
+	//var errMessage = ge( 'errors' );
+	//makegroup();
 	
-});
+	$( '#displayData' ).on( 'click', getData );
+	$( '#clearData'    ).on( 'click', clearLocal );
+	$( '#addNew'      ).on( 'click', windowReload );
+	
